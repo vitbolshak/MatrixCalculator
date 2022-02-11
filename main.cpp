@@ -9,21 +9,23 @@ int main()
     std::vector<std::vector<int>> v = {{1, 22}, {38, 4}};
     //constructor
     Matrix matrix(v);
-    cout << matrix.At(0,0);
-    matrix.At(0, 0) = 999;
     cout << matrix;
 
     //copy constructor (default)
     const Matrix matrix2(matrix);
-    cout << matrix2.At(0,1);
-//    matrix2.At(0, 1) = 999;
     cout << matrix2;
+    try
+    {
+        cout << matrix2 + matrix;
 
-    //assign operator (default)
-    Matrix matrix3 = matrix2;
-    cout << matrix3.At(1,1);
-    matrix3.At(1, 1) = 999;
-    cout << matrix3;
+        std::vector<std::vector<int>> v2 = {{1 , 2, 3}, {6, 5, 4}};
+        std::vector<std::vector<int>> v3 = {{1, 3, 4, 5}, {9, 8, 7, 6}, {6, 4, 2, 5}};
+        cout << Matrix(v2) * Matrix(v3);
+    }
+    catch (std::exception& e)
+    {
+        cout << e.what();
+    }
 
     return 0;
 }

@@ -76,6 +76,66 @@ public:
         return _container[i][j];
     };
 
+    Matrix<T> operator+(const Matrix<T>& other) const
+    {
+        if (GetShape() != other.GetShape())
+        {
+            throw std::range_error("Unable to sum matrices with different shapes");
+        }
+
+        const auto[rowCount, colCount] = GetShape();
+        return CreateNewMatrix(rowCount, colCount, [this, other](size_t i, size_t j)
+        {
+            return _container[i][j] + other._container[i][j];
+        });
+    }
+
+    Matrix<T> operator-(const Matrix<T>& other) const
+    {
+        if (GetShape() != other.GetShape())
+        {
+            throw std::range_error("Unable to subtract matrices with different shapes");
+        }
+
+        const auto[rowCount, colCount] = GetShape();
+        return CreateNewMatrix(rowCount, colCount, [this, other](size_t i, size_t j)
+        {
+            return _container[i][j] - other._container[i][j];
+        });
+    }
+
+    Matrix<T> operator*(const Matrix<T>& other) const
+    {
+        if (GetShape().second != other.GetShape().first)
+        {
+            throw std::range_error("Matrices shapes are unacceptable for multiplication");
+        }
+
+        return CreateNewMatrix(GetShape().first, other.GetShape().second, [this, other](size_t i, size_t j)
+        {
+            T newElement = 0;
+            for (size_t idx = 0; idx < GetShape().second; ++idx)
+            {
+                newElement += _container[i][idx] * other._container[idx][j];
+            }
+            return newElement;
+        });
+    }
+
+    Matrix<T> operator*(T factor) const
+    {
+        const auto[rowCount, colCount] = GetShape();
+        return CreateNewMatrix(rowCount, colCount, [this, factor](size_t i, size_t j)
+        {
+            return _container[i][j] * factor;
+        });
+    }
+
+    friend Matrix<T> operator*(T factor, const Matrix<T>& matrix)
+    {
+        return matrix * factor;
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix)
     {
         os << std::fixed << std::setprecision(3);
@@ -91,6 +151,31 @@ public:
 
         return os;
     };
+
+private:
+    /*
+     * CreateNewMatrix generates new matrix with given shape and according to new element generating function
+     * generateNewElementFunc takes two indexes as params and says how to create element on given indexes
+     */
+    template<class function>
+    Matrix<T> CreateNewMatrix(size_t rowCount, size_t colCount, function generateNewElementFunc) const
+    {
+        std::vector<std::vector<T>> resultContainer;
+
+        resultContainer.reserve(rowCount);
+        for (size_t i = 0; i < rowCount; ++i)
+        {
+            std::vector<T> row;
+            row.reserve(colCount);
+            for (size_t j = 0; j < colCount; ++j)
+            {
+                row.push_back(generateNewElementFunc(i, j));
+            }
+            resultContainer.push_back(std::move(row));
+        }
+
+        return Matrix{resultContainer};
+    }
 
 private:
     std::vector<std::vector<T>> _container;
