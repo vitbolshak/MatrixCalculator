@@ -143,7 +143,7 @@ public:
         {
             for (const auto& item : row)
             {
-                os << std::setw(9) << item;
+                os << std::setw(9) << item << ' ';
             }
             os << '\n';
         }
