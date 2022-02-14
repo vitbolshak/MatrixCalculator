@@ -7,20 +7,31 @@
 #include <vector>
 #include <utility>
 
+struct Shape
+{
+    size_t rowCount;
+    size_t colCount;
+
+    bool operator!=(Shape other)
+    {
+        return std::tie(rowCount, colCount) != std::tie(other.rowCount, other.colCount);
+    }
+};
+
 template <class T>
 class Matrix
 {
 public:
     explicit Matrix(const std::vector<std::vector<T>>& container): _container(container) {};
 
-    std::pair<size_t, size_t> GetShape() const
+    Shape GetShape() const
     {
         return {_container.size(), _container[0].size()};
     };
 
     std::vector<T> GetRow(size_t i) const
     {
-        if (i < 0 || i >= GetShape().first)
+        if (i < 0 || i >= GetShape().rowCount)
         {
             throw std::out_of_range("Row index is out of matrix range");
         }
@@ -30,15 +41,15 @@ public:
 
     std::vector<T> GetColumn(size_t j) const
     {
-        if (j < 0 || j >= GetShape().second)
+        if (j < 0 || j >= GetShape().colCount)
         {
             throw std::out_of_range("Column index is out of matrix range");
         }
 
         std::vector<T> column;
-        size_t n = GetShape().first;
-        column.reserve(n);
-        for (size_t i = 0; i < n; ++i)
+        size_t rowCount = GetShape().rowCount;
+        column.reserve(rowCount);
+        for (size_t i = 0; i < rowCount; ++i)
         {
             column.push_back(_container[i][j]);
         }
@@ -48,12 +59,12 @@ public:
 
     T& At(size_t i, size_t j)
     {
-        if (i < 0 || i >= GetShape().first)
+        if (i < 0 || i >= GetShape().rowCount)
         {
             throw std::out_of_range("Row index is out of matrix range");
         }
 
-        if (j < 0 || j >= GetShape().second)
+        if (j < 0 || j >= GetShape().colCount)
         {
             throw std::out_of_range("Column index is out of matrix range");
         }
@@ -63,12 +74,12 @@ public:
 
     const T& At(size_t i, size_t j) const
     {
-        if (i < 0 || i >= GetShape().first)
+        if (i < 0 || i >= GetShape().rowCount)
         {
             throw std::out_of_range("Row index is out of matrix range");
         }
 
-        if (j < 0 || j >= GetShape().second)
+        if (j < 0 || j >= GetShape().colCount)
         {
             throw std::out_of_range("Column index is out of matrix range");
         }
@@ -106,15 +117,15 @@ public:
 
     Matrix<T> operator*(const Matrix<T>& other) const
     {
-        if (GetShape().second != other.GetShape().first)
+        if (GetShape().colCount != other.GetShape().rowCount)
         {
             throw std::range_error("Matrices shapes are unacceptable for multiplication");
         }
 
-        return CreateNewMatrix(GetShape().first, other.GetShape().second, [this, other](size_t i, size_t j)
+        return CreateNewMatrix(GetShape().rowCount, other.GetShape().colCount, [this, other](size_t i, size_t j)
         {
             T newElement = 0;
-            for (size_t idx = 0; idx < GetShape().second; ++idx)
+            for (size_t idx = 0; idx < GetShape().colCount; ++idx)
             {
                 newElement += _container[i][idx] * other._container[idx][j];
             }
