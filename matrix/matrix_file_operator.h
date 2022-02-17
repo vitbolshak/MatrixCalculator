@@ -24,6 +24,11 @@ public:
 
         for (std::string line; std::getline(file, line);)
         {
+            if (line.empty())
+            {
+                break;
+            }
+
             std::stringstream ss(line);
             std::vector<T> row;
 
