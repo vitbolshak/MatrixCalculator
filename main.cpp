@@ -1,5 +1,6 @@
 #include "matrix/matrix.h"
 #include "matrix/matrix_file_operator.h"
+#include "matrix_math/matrix_math.h"
 
 #include <iostream>
 
@@ -10,7 +11,9 @@ int main()
     try
     {
         Matrix<int> matr = MatrixFileOperator::ReadMatrix<int>("matrix.txt", ',');
-        MatrixFileOperator::WriteMatrix("new_matrix.txt", matr);
+        cout << matr;
+        cout << MatrixMath::Trace(matr);
+        cout << MatrixMath::Transpose(matr);
     }
 
     catch (std::exception& e)
